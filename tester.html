@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>tester</title>
+	<meta name="generator" content="TextMate http://macromates.com/">
+	<meta name="author" content="Yehuda Katz">
+	<script src="jspec.js"></script>
+	<script>$ = "$"</script>
+	<script src="jquery.js"></script>
+	<script>
+	  jspec.describe("The browser environment", function() {
+	    it("should have Array.prototype.push", function() {
+	      Array.prototype.push.should("exist");
+	    });
+
+	    it("should have Function.prototype.apply", function() {
+	      Function.prototype.apply.should("exist");
+	    });
+
+	    it("should have document.getElementById", function() {
+        document.getElementById.should("exist");
+	    });	    
+
+      it("should have document.getElementsByTagName", function() {
+        document.getElementsByTagName.should("exist");
+      });
+      
+      it("should have RegExp", function() {
+        RegExp.should("exist");
+      });
+      
+      it("should have jQuery", function() {
+        jQuery.should("exist");
+      });
+	  })
+	  
+	  jspec.describe("$()", function() {
+	    it("should generate the correct number of elements for <code>", function() {
+	      $("<code/>").length.should("==", 1);
+	    });
+	    
+	    it("should generate the correct number of elements for <img>", function() {
+	      $("<img/>").length.should("==", 1);
+	    });
+	    
+	    it("should generate the correct number of elements for <div/><hr/><code/><b/>", function() {
+	      $("<div/><hr/><code/><b/>").length.should("==", 4);
+	    });
+	  })
+	  
+	  jspec.describe("jQuery.noConflict()", function() {
+	    var old = jQuery;
+	    var newjQuery = jQuery.noConflict();
+	    
+	    it("should return the jQuery object", function() {
+	      newjQuery.should("==", old);
+	    });
+	    
+	    it("should not have harmed the original jQuery", function() {
+	      jQuery.should("==", old)
+	    });
+	    
+	    it("should revert $", function() {
+	      $.should("==", "$");
+	    });
+	    
+	    jQuery = $ = old;
+	    newjQuery = jQuery.noConflict(true);
+	    
+	    
+	  })
+	  
+    // var old = jQuery;
+    // var newjQuery = jQuery.noConflict();
+    // 
+    // ok( newjQuery == old, "noConflict returned the jQuery object" );
+    // ok( jQuery == old, "Make sure jQuery wasn't touched." );
+    // ok( $ == "$", "Make sure $ was reverted." );
+    // 
+    // jQuery = $ = old;
+    // 
+    // newjQuery = jQuery.noConflict(true);
+    // 
+    // ok( newjQuery == old, "noConflict returned the jQuery object" );
+    // ok( jQuery == "jQuery", "Make sure jQuery was reverted." );
+    // ok( $ == "$", "Make sure $ was reverted." );
+    // 
+    // jQuery = $ = old;
+  	
+	
+	</script>
+	<!-- Date: 2007-10-28 -->
+</head>
+<body>
+
+</body>
+</html>

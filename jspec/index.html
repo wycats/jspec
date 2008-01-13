@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>tester2</title>
+	<meta name="generator" content="TextMate http://macromates.com/">
+	<meta name="author" content="Yehuda Katz">
+	<script src="jspec.js"></script>
+	<script>
+		window.onload = function() {
+			jspec.describe("JSpec", function() {
+				it("should support ==", function() {
+					(1).should("==", 1);
+					var arr = [];
+					arr.should("==", arr);
+					var obj = new Object;
+					obj.should("==", obj);
+					document.should("==", document);
+				});
+			
+				it("should support include", function() {
+					[1,2,3,4,5].should("include", 3);
+					[1,2,3,4,5].should_not("include", 3);
+					document.getElementsByTagName("div").should("include", document.getElementById("hello"))
+				});
+				
+				it("should support exists", function() {
+					document.should("exist");
+				});
+				
+				jspec.matchers["have_tag_name"] = {
+					describe: function(target, not) {
+						return jspec.compress_lines(this) + " should " + (not ? "not " : "") + "have " + target + " as its tag name."
+					},
+					matches: function(target) {
+						return (this.tagName && this.tagName == target) ? true : false;
+					},
+					failure_message: function(target, not) {
+						return "Expected " + this.toString() + (not ? " not " : " ") + "to have " + target + " as its tag name," +
+							" but was " + this.tagName;
+					}
+				};
+				
+				it("should support custom matchers", function() {
+					document.getElementById("wrapper").should("have_tag_name", "DIV");
+					document.getElementById("wrapper").should_not("have_tag_name", "SPAN");
+					document.getElementById("wrapper").should("have_tag_name", "SPAN");					
+				});
+			});
+		};
+	</script>	
+	<style type="text/css">
+		div#wrapper { display: none ;}
+	</style>
+</head>
+<body>
+
+	<div id="wrapper"><div id="hello">Hello</div></div>
+
+</body>
+</html>
