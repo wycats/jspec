@@ -12,42 +12,42 @@
 		window.onload = function() {
 			jspec.describe("JSpec", function() {
 				it("should support ==", function() {
-					(1).should("==", 1);
+					expect(1).to("==", 1);
 					var arr = [];
-					arr.should("==", arr);
+					expect(arr).to("==", arr);
 					var obj = new Object;
-					obj.should("==", obj);
-					document.should("==", document);
+					expect(obj).to("==", obj);
+					expect(document).to("==", document);
 				});
 			
-				it("should support include", function() {
-					[1,2,3,4,5].should("include", 3);
-					[1,2,3,4,5].should_not("include", 3);
-					document.getElementsByTagName("div").should("include", document.getElementById("hello"))
-				});
-				
-				it("should support exists", function() {
-					document.should("exist");
-				});
-				
-				jspec.matchers["have_tag_name"] = {
-					describe: function(target, not) {
-						return jspec.print_object(this) + " should " + (not ? "not " : "") + "have " + target + " as its tag name."
-					},
-					matches: function(target) {
-						return (this.tagName && this.tagName == target) ? true : false;
-					},
-					failure_message: function(target, not) {
-						return "Expected " + this.toString() + (not ? " not " : " ") + "to have " + target + " as its tag name," +
-							" but was " + this.tagName;
-					}
-				};
-				
-				it("should support custom matchers", function() {
-					document.getElementById("wrapper").should("have_tag_name", "DIV");
-					document.getElementById("wrapper").should_not("have_tag_name", "SPAN");
-					document.getElementById("wrapper").should("have_tag_name", "SPAN");					
-				});
+        it("should support include", function() {
+         expect([1,2,3,4,5]).to("include", 3);
+         expect([1,2,3,4,5]).not_to("include", 3);
+         expect(document.getElementsByTagName("div")).to("include", document.getElementById("hello"))
+        });
+        
+        it("should support exists", function() {
+         expect(document).to("exist");
+        });
+        
+        jspec.matchers["have_tag_name"] = {
+         describe: function(self, target, not) {
+           return jspec.print_object(self) + " should " + (not ? "not " : "") + "have " + target + " as its tag name."
+         },
+         matches: function(self, target) {
+           return (self.tagName && self.tagName == target) ? true : false;
+         },
+         failure_message: function(self, target, not) {
+           return "Expected " + jspec.print_object(self) + (not ? " not " : " ") + "to have " + target + " as its tag name," +
+             " but was " + self.tagName;
+         }
+        };
+        
+        it("should support custom matchers", function() {
+         expect(document.getElementById("wrapper")).to("have_tag_name", "DIV");
+         expect(document.getElementById("wrapper")).to("have_tag_name", "SPAN");
+         expect(document.getElementById("wrapper")).not_to("have_tag_name", "SPAN");         
+        });
 			});
 		};
 	</script>	

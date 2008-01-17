@@ -27,34 +27,32 @@ jspec = {
 		jspec.logger(jspec.TOP_LEVEL, str);
 		var it = function(str, fn) {
 			jspec.logger(jspec.DESCRIBE, str);
-			fn.call();
+			fn();
 		};
-		Object.prototype.should = function(fn_str, to_compare, not) {
+		var Expectation = function(p) { this.expectation = p; };
+		Expectation.prototype.to = function(fn_str, to_compare, not) {
 		  try {
-			  var pass = jspec.matchers[fn_str].matches.call(this, to_compare);
+			  var pass = jspec.matchers[fn_str].matches(this.expectation, to_compare);
 				if(not) var pass = !pass;
 			} catch(e) {
 			  var pass = null;
 			}
 			var should_string = (jspec.matchers[fn_str].describe && 
-			  jspec.matchers[fn_str].describe.call(this, to_compare, not)) || 
+			  jspec.matchers[fn_str].describe(this.expectation, to_compare, not)) || 
 			  this.toString() + " should " + (not ? "not " : "") + fn_str + " " + to_compare;
 			if(pass) {
 				jspec.logger(jspec.IT_SHOULD, should_string + " (PASS)");
 			}	else {
 				jspec.logger(jspec.IT_SHOULD, should_string + (pass == false ? " (FAIL)" : " (ERROR)"));
-				jspec.logger(jspec.FAILURE, jspec.matchers[fn_str].failure_message.call(this, to_compare, not))
+				jspec.logger(jspec.FAILURE, jspec.matchers[fn_str].failure_message(this.expectation, to_compare, not))
 			}
-		};
-		Object.prototype.should_not = function(fn_str, to_compare) {
-			this.should(fn_str, to_compare, true);
-		};
+		}
+		Expectation.prototype.not_to = function(fn_str, to_compare) { this.to(fn_str, to_compare, true) }
+		var expect = function(p) { return new Expectation(p) };
 		x = desc.toString()
 		var fn_body = this.fn_contents(desc);
-		var fn = new Function("it", fn_body);
-		fn.call(this, it);
-		delete Object.prototype.should
-		delete Object.prototype.should_not
+		var fn = new Function("it", "expect", fn_body);
+		fn.call(this, it, expect);
 	}
 }
 
@@ -65,6 +63,9 @@ jspec.print_object = function(obj) {
     return obj.toString().match(/^([^\{]*) {/)[1];
 	} else if(obj instanceof Array) {
 		return "[" + obj.toString() + "]";
+	} else if(obj instanceof HTMLElement) {
+		return "<" + obj.tagName + " " + (obj.className != "" ? "class='" + obj.className + "'" : "") + 
+			(obj.id != "" ? "id='" + obj.id + "'" : "") + ">";
   } else {
     return obj.toString().replace(/\n\s*/g, "");
   }
@@ -75,43 +76,43 @@ jspec.print_object = function(obj) {
 jspec.matchers = {};
 
 jspec.matchers["=="] = {
-  describe: function(target, not) {
-    return jspec.print_object(this) + " should " + (not ? "not " : "") + "equal " + jspec.print_object(target)
+  describe: function(self, target, not) {
+    return jspec.print_object(self) + " should " + (not ? "not " : "") + "equal " + jspec.print_object(target)
   },
-	matches: function(target) {
-		return this == target;
+	matches: function(self, target) {
+		return self == target;
 	},
-	failure_message: function(target, not) {
+	failure_message: function(self, target, not) {
 		if (not)
-			return "Expected " + jspec.print_object(this) + " not to equal " + jspec.print_object(target);
+			return "Expected " + jspec.print_object(self) + " not to equal " + jspec.print_object(target);
 		else
-			return "Expected " + jspec.print_object(this) + ". Got " + jspec.print_object(target);
+			return "Expected " + jspec.print_object(self) + ". Got " + jspec.print_object(target);
 	}
 }
 
 jspec.matchers["include"] = {
-	matches: function(target) {
-		if(Array.prototype.indexOf) return Array.prototype.indexOf.call(this, target) != -1;
+	matches: function(self, target) {
+		if(Array.prototype.indexOf) return Array.prototype.indexOf.call(self, target) != -1;
 		else {
-			for(i=0,j=this.length;i<j;i++) {
-				if(target == this[i]) return true;
+			for(i=0,j=self.length;i<j;i++) {
+				if(target == self[i]) return true;
 			}
 			return false;
 		}
 	},
-	failure_message: function(target, not) {
-		return "Expected [" + jspec.print_object(this) + "] " + (not ? "not " : "") + "to include " + target;
+	failure_message: function(self, target, not) {
+		return "Expected [" + jspec.print_object(self) + "] " + (not ? "not " : "") + "to include " + target;
 	}  
 }
 
 jspec.matchers["exist"] = {
-  describe: function(target, not) {
-    return jspec.print_object(this) + " should " + (not ? "not " : "")  + "exist."
+  describe: function(self, target, not) {
+    return jspec.print_object(self) + " should " + (not ? "not " : "")  + "exist."
   },
-  matches: function(target) {
+  matches: function(self, target) {
     return !!this;
   },
-  failure_message: function(target, not) {
-    return "Expected " + (not ? "not " : "") + "to exist, but was " + jspec.print_object(this);
+  failure_message: function(self, target, not) {
+    return "Expected " + (not ? "not " : "") + "to exist, but was " + jspec.print_object(self);
   }
 }
