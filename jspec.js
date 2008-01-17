@@ -2,24 +2,31 @@ jspec = {
 	fn_contents: function(fn) {
 		return fn.toString().match(/^[^\{]*{((.*\n*)*)}/m)[1];
 	},
-	TOP_LEVEL: 0,
-	DESCRIBE: 1,
-	IT_SHOULD: 2,
-	FAILURE: 3,
+	TOP_LEVEL: 0, DESCRIBE: 1, IT_SHOULD_PASS: 2, IT_SHOULD_FAIL: 3, 
+	FAILURE: 4, DONE_EXAMPLE: 5, DONE_GROUP: 6,
 	logger: function(state, message) {
 		switch(state) {
 			case jspec.TOP_LEVEL:
-				console.log(message);
+				console.group(message);
 				break;
 			case jspec.DESCRIBE:
-				console.log("- " + message);
+				console.group(message);
 				break;
-			case jspec.IT_SHOULD:
-				console.log("  - " + message);
+			case jspec.IT_SHOULD_PASS:
+				console.info(message);
+				break;
+			case jspec.IT_SHOULD_FAIL:
+				console.group(message);
 				break;
 			case jspec.FAILURE:
-				console.log("    " + message);
+				console.error(message);
+				console.groupEnd();
 				break;
+			case jspec.DONE_EXAMPLE:
+				console.groupEnd();
+				break;
+			case jspec.DONE_GROUP:
+				console.groupEnd();
 		}
 		
 	},
@@ -28,6 +35,7 @@ jspec = {
 		var it = function(str, fn) {
 			jspec.logger(jspec.DESCRIBE, str);
 			fn();
+			jspec.logger(jspec.DONE_EXAMPLE);			
 		};
 		var Expectation = function(p) { this.expectation = p; };
 		Expectation.prototype.to = function(fn_str, to_compare, not) {
@@ -41,9 +49,9 @@ jspec = {
 			  jspec.matchers[fn_str].describe(this.expectation, to_compare, not)) || 
 			  this.toString() + " should " + (not ? "not " : "") + fn_str + " " + to_compare;
 			if(pass) {
-				jspec.logger(jspec.IT_SHOULD, should_string + " (PASS)");
+				jspec.logger(jspec.IT_SHOULD_PASS, should_string + " (PASS)");
 			}	else {
-				jspec.logger(jspec.IT_SHOULD, should_string + (pass == false ? " (FAIL)" : " (ERROR)"));
+				jspec.logger(jspec.IT_SHOULD_FAIL, should_string + (pass == false ? " (FAIL)" : " (ERROR)"));
 				jspec.logger(jspec.FAILURE, jspec.matchers[fn_str].failure_message(this.expectation, to_compare, not))
 			}
 		}
@@ -53,6 +61,7 @@ jspec = {
 		var fn_body = this.fn_contents(desc);
 		var fn = new Function("it", "expect", fn_body);
 		fn.call(this, it, expect);
+		jspec.logger(jspec.DONE_GROUP);
 	}
 }
 
