@@ -3,7 +3,7 @@ jspec = {
 		return fn.toString().match(/^[^\{]*{((.*\n*)*)}/m)[1];
 	},
 	TOP_LEVEL: 0, DESCRIBE: 1, IT_SHOULD_PASS: 2, IT_SHOULD_FAIL: 3, 
-	FAILURE: 4, DONE_EXAMPLE: 5, DONE_GROUP: 6,
+	FAILURE: 4, DONE_EXAMPLE: 5, DONE_GROUP: 6, PENDING: 7,
 	logger: function(state, message) {
 		switch(state) {
 			case jspec.TOP_LEVEL:
@@ -27,15 +27,23 @@ jspec = {
 				break;
 			case jspec.DONE_GROUP:
 				console.groupEnd();
+  			break;
+  		case jspec.PENDING:
+    		console.warn("Pending: " + message);
+  			break;
 		}
 		
 	},
 	describe: function(str, desc) {
 		jspec.logger(jspec.TOP_LEVEL, str);
 		var it = function(str, fn) {
-			jspec.logger(jspec.DESCRIBE, str);
-			fn();
-			jspec.logger(jspec.DONE_EXAMPLE);			
+			if(fn) {
+				jspec.logger(jspec.DESCRIBE, str);
+				fn();
+				jspec.logger(jspec.DONE_EXAMPLE);
+			} else {
+				jspec.logger(jspec.PENDING, str);
+			};
 		};
 		var Expectation = function(p) { this.expectation = p; };
 		Expectation.prototype.to = function(fn_str, to_compare, not) {
