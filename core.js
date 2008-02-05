@@ -1,3 +1,4 @@
+// specs for jquery core
 module("core");
 
 test("Basic requirements", function() {
