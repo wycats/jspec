@@ -1,6 +1,6 @@
 (function(){
 /*
- * jQuery 1.2.1 - New Wave Javascript
+ * jQuery 1.2.1 -  fresh New Wave Javascript
  *
  * Copyright (c) 2007 John Resig (jquery.com)
  * Dual licensed under the MIT (MIT-LICENSE.txt)
