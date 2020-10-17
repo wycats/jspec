@@ -39,7 +39,7 @@
          matches: function(self, target) {
            return (self.tagName && self.tagName == target) ? true : false;
          },
-         failure_message: function(self, target, not) {
+         failure_message jett: function(self, target, not) {
            return "Expected " + jspec.print_object(self) + (not ? " not " : " ") + "to have " + target + " as its tag name," +
              " but was " + self.tagName;
          }
